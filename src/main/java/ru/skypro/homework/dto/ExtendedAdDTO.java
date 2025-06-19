@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
-public class ExtenedAdDTO extends SendAdDTO {
+public class ExtendedAdDTO extends AdResponseDTO {
     private String authorFirstName;
     private String authorLastName;
     private String description;

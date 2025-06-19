@@ -7,7 +7,7 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class SendAdDTO {
+public class AdResponseDTO {
     private Integer author;
     private String image;
     private Integer pk;

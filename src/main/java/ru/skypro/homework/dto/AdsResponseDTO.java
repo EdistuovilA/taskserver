@@ -12,6 +12,6 @@ import java.util.List;
 @Setter
 public class AdsResponseDTO {
     private Integer count;
-    private List<SendAdDTO> results = Collections.singletonList(new SendAdDTO());
+    private List<AdResponseDTO> results = Collections.singletonList(new AdResponseDTO());
 
 }
