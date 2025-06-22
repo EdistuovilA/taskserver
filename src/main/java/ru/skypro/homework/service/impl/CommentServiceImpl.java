@@ -45,7 +45,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public Comments getComments(Long id) {
-        log.info("Запущен метод сервиса {}", LoggingMethodImpl.getMethodName());
+        log.info("Method: {}", LoggingMethodImpl.getMethodName());
         List<Comment> comments = commentRepository.findByAdId(id).stream()
                 .map(commentMapper::mapperToCommentDto)
                 .collect(Collectors.toList());
@@ -56,32 +56,26 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public Comment addComment(Long id, CreateOrUpdateComment createOrUpdateComment, String username) {
-        log.info("Запущен метод сервиса {}", LoggingMethodImpl.getMethodName());
+        log.info("Method: {}", LoggingMethodImpl.getMethodName());
 
         UserEntity author = userService.getUser(username);
         AdEntity ad = adRepository.findById(id).orElse(null);
 
-        //Создаем сущность comment и заполняем поля
         CommentEntity commentEntity = new CommentEntity();
         commentEntity.setAuthor(author);
         commentEntity.setAdEntity(ad);
         commentEntity.setText(createOrUpdateComment.getText());
         commentEntity.setCreatedAt(System.currentTimeMillis());
 
-        //Сохраняем сущность commentEntity в БД
         commentRepository.save(commentEntity);
 
-        //Заполняем поле с комментариями у пользователя и сохраняем в БД
         author.getComments().add(commentEntity);
         userRepository.save(author);
 
-        //Создаем возвращаемую сущность ДТО comment и заполняем поля
         Comment commentDTO = new Comment();
         commentDTO.setAuthor(author.getId());
 
         Long avatarId = author.getPhoto().getId();
-        log.info("id автора комментария - {}", author.getId());
-        log.info("URL для получения аватара автора комментария: /photo/image/{}", avatarId);
         commentDTO.setAuthorImage("/photo/image/" + avatarId);
 
         commentDTO.setAuthorFirstName(author.getFirstName());
@@ -94,35 +88,41 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public String deleteComment(Long commentId, String username) {
-        log.info("Запущен метод сервиса {}", LoggingMethodImpl.getMethodName());
+        log.info("Method: {}", LoggingMethodImpl.getMethodName());
         Optional<CommentEntity> comment = commentRepository.findById(commentId);
         if (comment.isPresent()) {
             UserEntity author = userService.getUser(username);
             if (author.getRole().equals(Role.ADMIN)) {
                 commentRepository.delete(comment.get());
-                return "комментарий удален";
+                return "comment deleted";
             } else if (author.getRole().equals(Role.USER)) {
                 if (comment.get().getAuthor().getUserName().equals(author.getUserName())) {
                     commentRepository.delete(comment.get());
-                    return "комментарий удален";
+                    return "comment deletedd";
                 } else {
-                    return "forbidden"; //'403' For the user deletion is forbidden
+                    return "forbidden";
                 }
             }
         }
-        return "not found"; //'404' Comment not found
+        return "not found";
     }
 
     @Override
     public Comment updateComment(Long adId,
                                  Long commentId,
                                  CreateOrUpdateComment createOrUpdateComment) {
-        log.info("Использован метод сервиса: {}", LoggingMethodImpl.getMethodName());
+        log.info("Method: {}", LoggingMethodImpl.getMethodName());
 
         CommentEntity comment = commentRepository.findById(commentId).get();
         comment.setText(createOrUpdateComment.getText());
         commentRepository.save(comment);
         return commentMapper.mapperToCommentDto(comment);
+    }
+
+    public boolean isAuthorComment(String username, Long commentId) {
+        log.info("Method: {}", LoggingMethodImpl.getMethodName());
+        CommentEntity comment = commentRepository.findById(commentId).orElseThrow();
+        return comment.getAuthor().getUserName().equals(username);
     }
 
 }

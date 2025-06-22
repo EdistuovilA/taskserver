@@ -22,6 +22,7 @@ public class UserEntity extends ModelEntity {
     private String firstName;
     private String lastName;
     private String phone;
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     @OneToOne

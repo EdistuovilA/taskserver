@@ -42,12 +42,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void setPassword(NewPassword newPass, Authentication authentication) {
-        log.info("Запущен метод сервиса {}", LoggingMethodImpl.getMethodName());
+        log.info("Method: {}", LoggingMethodImpl.getMethodName());
         String oldPassword = newPass.getCurrentPassword();
         String encodeNewPassword = encoder.encode(newPass.getNewPassword());
         UserEntity userEntity = userRepository.findUserEntityByUserName(authentication.getName());
         if (!encoder.matches(oldPassword, userEntity.getPassword())) {
-            throw new PasswordIsNotMatchException("Пароли не совпадают");
+            throw new PasswordIsNotMatchException("incorrect current password");
         } else {
             userEntity.setPassword(encodeNewPassword);
         }
@@ -57,10 +57,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserEntity getUser(String username) {
-        log.info("Запущен метод сервиса {}", LoggingMethodImpl.getMethodName());
+        log.info("Method: {}", LoggingMethodImpl.getMethodName());
         UserEntity user = userRepository.findUserEntityByUserName(username);
         if (user == null) {
-            throw new UserNotFoundException("Пользователя с таким логином в базе данных нет");
+            throw new UserNotFoundException("no such user in bd");
         }
         return user;
     }
@@ -68,7 +68,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserEntity updateUser(UpdateUser updateUser, Authentication authentication) {
-        log.info("Запущен метод сервиса {}", LoggingMethodImpl.getMethodName());
+        log.info("Method: {}", LoggingMethodImpl.getMethodName());
         String userName = authentication.getName();
         UserEntity user = userRepository.findUserEntityByUserName(userName);
         user.setFirstName(updateUser.getFirstName());
